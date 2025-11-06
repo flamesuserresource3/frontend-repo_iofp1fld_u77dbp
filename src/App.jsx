@@ -1,28 +1,43 @@
-import { useState } from 'react'
+import React, { useState } from 'react';
+import HeroSection from './components/HeroSection';
+import GameBoard from './components/GameBoard';
+import ScoreBoard from './components/ScoreBoard';
+import HowToPlay from './components/HowToPlay';
 
-function App() {
-  const [count, setCount] = useState(0)
+export default function App() {
+  const [started, setStarted] = useState(false);
+  const [bestScore, setBestScore] = useState(0);
+  const [lastScore, setLastScore] = useState(0);
+  const [liveScore, setLiveScore] = useState(0);
+
+  const handleStart = () => {
+    setLiveScore(0);
+    setStarted(true);
+    window.scrollTo({ top: document.body.scrollHeight, behavior: 'smooth' });
+  };
+
+  const handleFinish = (score) => {
+    setLastScore(score);
+    setBestScore((b) => (score > b ? score : b));
+    setStarted(false);
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-purple-50 to-blue-50 flex items-center justify-center">
-      <div className="bg-white p-8 rounded-lg shadow-lg">
-        <h1 className="text-3xl font-bold text-gray-800 mb-4">
-          Vibe Coding Platform
-        </h1>
-        <p className="text-gray-600 mb-6">
-          Your AI-powered development environment
-        </p>
-        <div className="text-center">
-          <button
-            onClick={() => setCount(count + 1)}
-            className="bg-blue-500 hover:bg-blue-600 text-white font-semibold py-2 px-4 rounded"
-          >
-            Count is {count}
-          </button>
-        </div>
-      </div>
-    </div>
-  )
-}
+    <div className="min-h-screen bg-white text-neutral-900">
+      <HeroSection onStart={handleStart} />
 
-export default App
+      <ScoreBoard best={bestScore} last={lastScore} />
+
+      {started ? (
+        <GameBoard onFinish={handleFinish} onScore={setLiveScore} />
+      ) : (
+        <HowToPlay />
+      )}
+
+      <footer className="mx-auto my-10 w-full max-w-4xl px-6 text-center text-sm text-neutral-500">
+        Made with love for playful learning. Have fun!
+      </footer>
+    </div>
+  );
+}
